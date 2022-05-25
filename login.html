@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyWeather | Login </title>
+    <link rel="stylesheet" href="style.css">
+
+    <script>
+        function validateForm() {
+            //validate username
+            //validate pw
+
+            return true;
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h2>MyWeather</h2>
+        <div class="detail">
+            <form action="dashboard.php" onsubmit="return validateForm()" method="POST">
+                <div class="group">
+                    <label for="username">username: </label>
+                    <input type="text" name="username" id="username">
+                </div>
+
+                <div class="group">
+                    <label for="password">password: </label>
+                    <input type="text" name="password" id="password">
+                </div>
+
+                <button class="btn_login">submit</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
