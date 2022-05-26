@@ -4,8 +4,11 @@ error_reporting(0);
 
 //a function to get JSON data from a given url
 function getJSONFromURL($url) {
+    //set up url, append api key 
+    $apiKey = '8b764506552125710ce8a32479ddc5f4';
+    $url .= $apiKey;
+
     //set up curl (client uniform resource locator)
-    
     //initiate
     $ch = curl_init();
     //returns response, if false it will print the response
@@ -22,30 +25,49 @@ function getJSONFromURL($url) {
     return $json;
 }
 
-//outputs the possible location data
-function outputPossibleLocations($json) {
-    $output = '';
-    foreach ($json as $value) {
-        $output .= '<button>' . $value['name'] . ', ' . $value['state'] . '</button>';
-    }
-    return $output;
-}
-
-//api key for OpenWeather API
-$apiKey = '8b764506552125710ce8a32479ddc5f4';
-
-//if there is user input inside city search box, do this
-if (isset($_POST['city'])) {
+//a function that gets cities and outputs it
+function outputCities() {
     //get city variable from user
     $city = $_POST['city'];
-    //implementing OpenWeather API
-    $url = 'http://api.openweathermap.org/geo/1.0/direct?q=' . $city . '&limit=5&appid=' . $apiKey;
+
+    //prepare the url of API we want to access
+    $url = 'http://api.openweathermap.org/geo/1.0/direct?q=' . $city . '&limit=5&appid=';
+
+    //make api call to get JSON data
     $json = getJSONFromURL($url);
 
-    //output the data
-    echo outputPossibleLocations($json);
+    //output data
+    //for each city, get the weather details
+    foreach ($json as $value) {
+        //format longitude and lattitude for api call
+        $lat = substr($value['lat'],0,5);
+        $lon = substr($value['lon'],0,5);
+        
+        //get weather data using latitude and longitude coordinates
+        $cityWeatherJSON = getWeather($lat,$lon);
+
+        //display weather data
+        // $output .= '<p>32deg<br>';
+        // $output .= $value['name'] . ', ' . $value['state'] . '<br>';
+        // $output .= 'humidity: <br><br>';
+    }
+    //echo $output;    
 }
 
+//a function that gets the weather using latitude and longitude (reqired) of a city
+function getWeather($lat,$lon) {
+    echo '<br>lat: ' . $lat . ' lon: ' . $lon . '<br>';
+
+    //prepare the url of API we want to access
+    $url = 'https://api.openweathermap.org/data/3.0/onecall?lat=' . $lat . '&lon='. $lon .'&exclude=hourly,daily&appid=';
+    
+    $json = getJSONFromURL($url);
+    echo '<br>json:<br>';
+    foreach ($json as $value) {
+        echo 'timezone: ' . $value['timezone'] . '<br>';
+    }
+    //return $json;
+}
 ?>
 
 <!DOCTYPE html>
@@ -58,7 +80,18 @@ if (isset($_POST['city'])) {
     <link rel="stylesheet" href="style.css">
     <script>
         //make sure city input box is filled out
-        function validate() {
+        function validate() {}
+
+        function setCity(city) {
+            lat = city.dataset.lat;
+            lon = city.dataset.lon;
+
+            //clear previous data
+            localStorage.clear();
+
+            //set data
+            localStorage.setItem('lon', lon);
+            localStorage.setItem('lat',lat);
         }
     </script>
 </head>
@@ -76,16 +109,14 @@ if (isset($_POST['city'])) {
             </div>
 
             <div id="output">
-                <!-- <div class="weather">
-                    <h2 id="temp">32°F</h2>
-                    <h3 id="location">rochester, ny</h3>
-                    <p>humidity: <span id="humidity">30%</span></p>
-                </div>
-                <div class="options">
-                    <button>daily</button>
-                    <button>weekly</button>
-                    <button>custom date</button>
-                </div> -->
+                <?php
+                    if (isset($_POST['city'])) {
+                        
+                        //output the data
+                        outputCities($json);
+                    }
+                ?>
+                
             </div>
 
         </div>
